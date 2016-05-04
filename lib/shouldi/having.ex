@@ -66,9 +66,17 @@ defmodule ShouldI.Having do
     end
   end
 
+  @avail_test_name_length 255 - byte_size("test having '")
+
   def test_name(module, name) do
     path = Module.get_attribute(module, :shouldi_having_path)
-    "having '" <> path_to_name(path) <> "': " <> name
+    full_name = path_to_name(path) <> "': " <> name
+    trunc_name =
+      case full_name do
+        str when byte_size(str) <= @avail_test_name_length -> str
+        str -> "..." <> (str |> String.slice(-(@avail_test_name_length - 3)..-1))
+      end
+    "having '" <> trunc_name
   end
 
   defp path_to_name(path) do

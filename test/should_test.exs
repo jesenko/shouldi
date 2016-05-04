@@ -10,6 +10,23 @@ defmodule ShouldTest do
     assert 1 + 2 == 3
   end
 
+  @just_bellow_length_limit(0..204 |> Enum.map_join(fn(_) -> "a" end))
+  @just_above_length_limit(0..209 |> Enum.map_join(fn(_) -> "a" end))
+
+  having @just_above_length_limit do
+    should "trim start of test name" do
+      {funct_name, _} = __ENV__.function
+      assert String.starts_with?(funct_name |> to_string, "test having '...")
+    end
+  end
+
+  having @just_bellow_length_limit do
+    should "not trim start of test name" do
+      {funct_name, _} = __ENV__.function
+      assert String.starts_with?(funct_name |> to_string, "test having 'aaa")
+    end
+  end
+
   having "an inner context" do
     setup(context) do
       context
